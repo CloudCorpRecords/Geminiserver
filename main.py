@@ -53,12 +53,16 @@ def generate_text():
         model = genai.GenerativeModel(model_name)
         response = model.generate_content(prompt, **parameters)
 
+        # Remove markdown tags from response text
+        response_text = re.sub(r'```html', '', response.text)
+        response_text = re.sub(r'```', '', response_text)
+
         # Extract CSS, JavaScript, and HTML
-        css = re.findall(r"<style>(.*?)</style>", response.text, re.DOTALL)
+        css = re.findall(r"<style>(.*?)</style>", response_text, re.DOTALL)
         css = css[0] if css else ""
-        javascript = re.findall(r"<script>(.*?)</script>", response.text, re.DOTALL)
+        javascript = re.findall(r"<script>(.*?)</script>", response_text, re.DOTALL)
         javascript = javascript[0] if javascript else ""
-        html_content = re.sub(r"<style>.*?</style>", "", response.text, flags=re.DOTALL)
+        html_content = re.sub(r"<style>.*?</style>", "", response_text, flags=re.DOTALL)
         html_content = re.sub(r"<script>.*?</script>", "", html_content, flags=re.DOTALL)
 
         # Construct the complete HTML structure
